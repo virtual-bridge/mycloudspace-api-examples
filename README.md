@@ -1,2 +1,3 @@
-# mycloudspace-api-examples
+# MyCloudSpace API Examples
 Examples for using MyCloudSpace via the RESTful api
+
