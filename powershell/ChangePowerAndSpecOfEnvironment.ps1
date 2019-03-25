@@ -38,8 +38,7 @@ $Script:LogPath = 'C:\Temp\AutoPowerOnOff.log'
 #)
 $vmList =
 @(
-	[pscustomobject]@{name="Sharepoint01";poweredOnCores=1;poweredOnSockets=4;poweredOnMemory=2},
-	[pscustomobject]@{name="WEBBackend";poweredOnCores=2;poweredOnSockets=2;poweredOnMemory=4}
+
 )
 
 #[LOGIN/CREDENTIALS] -----------------------#
