@@ -9,6 +9,9 @@ The project will be organised into folders based on the base language.
 #### ChangePowerAndSpecOfEnvironment.ps1
 Designed as a script to power off and de-spec a set of servers to save resource costs when an environment such as Dev/Test is not in use. When required the script can power the machines back on and set the specification of the server (CPU, Memory etc) back to desired values as defined in the script.
 
+#### TakeSnapshotOfVirtualMachine.ps1
+Finds a single VM by Hostname (guest hostname) and if found, takes a snapshot with the provided name. Waits for snapshot to become active then terminates. Will exit out if snapshot does not exist on platform withing ~35 seconds.
+
 ## Disclaimer
 
 THE INFORMATION CONTAINED IN THE VIRTUAL BRIDGE DEVELOPER DOCUMENTATION AND EXAMPLES IS INTENDED FOR SOFTWARE DEVELOPERS INTERESTED IN DEVELOPING SERVICE MANAGEMENT APPLICATIONS USING THE MYCLOUDSPACE APPLICATION PROGRAMMING INTERFACE (API). THE DOCUMENT IS FOR INFORMATIONAL PURPOSES ONLY AND IS PROVIDED “AS IS.”
