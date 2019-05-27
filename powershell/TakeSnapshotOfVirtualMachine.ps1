@@ -1,14 +1,10 @@
 using namespace System
 
-#Example of driving MyCloudSpace with powershell
+#Take a snapshot 
 
-#to power off an floor the spec execute with  
-#.\script.ps1 -mode off
+#.\TakeSnapshotOfVirtualMachine.ps1 -vmHostname "WIN-2A4JPC0ITEJ" -snapshotName "This is from the API"
 
-#to power n and reset desired spec execute with 
-#.\script.ps1 -mode on
-
-#NOTE: that you need to set your logpath, vm list, credentials sections below
+#NOTE: that you need to set your logpath, credentials in the sections below
 
 Param
 (
