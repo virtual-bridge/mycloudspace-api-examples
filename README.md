@@ -2,7 +2,7 @@
 Examples for using MyCloudSpace via the RESTful api
 
 ## Structure
-The project will be organised into folders based on the base language.
+The project will be organised into folders based on the base language. There are examples for you to login with 2fa using the existing credentials you have for the system as well as via api key. If you would like an API key for your user please contact us.
 
 ### Powershell
 
