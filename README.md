@@ -12,6 +12,9 @@ Designed as a script to power off and de-spec a set of servers to save resource 
 #### TakeSnapshotOfVirtualMachine.ps1
 Finds a single VM by Hostname (guest hostname) and if found, takes a snapshot with the provided name. Waits for snapshot to become active then terminates. Will exit out if snapshot does not exist on platform withing ~35 seconds.
 
+#### VMCost.ps1
+Finds a single VM by the name specified in MyCloudSpace and if found, pulls out billing data for the current period including an hourly burn rate. The payload also includes some virtual machine details such as health, last backup and guest information.
+
 ## Disclaimer
 
 THE INFORMATION CONTAINED IN THE VIRTUAL BRIDGE DEVELOPER DOCUMENTATION AND EXAMPLES IS INTENDED FOR SOFTWARE DEVELOPERS INTERESTED IN DEVELOPING SERVICE MANAGEMENT APPLICATIONS USING THE MYCLOUDSPACE APPLICATION PROGRAMMING INTERFACE (API). THE DOCUMENT IS FOR INFORMATIONAL PURPOSES ONLY AND IS PROVIDED “AS IS.”
