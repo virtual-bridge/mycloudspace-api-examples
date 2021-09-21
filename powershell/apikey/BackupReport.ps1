@@ -1,22 +1,16 @@
 using namespace System
 
-#VM Cost
+#Backup Report
 
-#.\VMCost.ps1 -vmName "WIN-2A4JPC0ITEJ"
+#.\BackupReport.ps1
 
 #NOTE: that you need to set your logpath, credentials in the sections below
-
-Param
-(
-	[Parameter(Mandatory=$true)][String] 
-    $vmName
-)
 
 #------------------- SETUP ---------------------#
 
 #[LOG FILE] ---------------------#
 #log file path you want to output the script log too
-$Script:LogPath = 'C:\Temp\VMCost.log'
+$Script:LogPath = 'C:\Temp\BackupReport.log'
 
 
 #[LOGIN/CREDENTIALS] -----------------------#
@@ -143,58 +137,46 @@ if ($clientId -eq 0)
 
 
 #get list of virtual machines from the platform
-$clientVms = Invoke-RestMethod -Uri ($baseApi + 'api/client/virtualresources/' + $clientId) -ContentType 'application/json' -Method Get -Headers $headers;
-
-#find the VM by name
-$vmObj = $clientVms | where {$_.name -eq $vmName}
-if ($vmObj.id)
+$backupSessions = Invoke-RestMethod -Uri ($baseApi + 'api/backup/backupsessions/' + $clientId) -ContentType 'application/json' -Method Get -Headers $headers;
+$backupSessions
+foreach ($session in $backupSessions)
 {
-    Write-Log -Message "Found $($vmObj.name)"
 
-    $co = Invoke-RestMethod -Uri ($baseApi + 'api/virtualresource/' + $vmObj.id + '/billingmonitor') -Method Get -Headers $headers;
+    Write-Host $([string]::Format("{0} ({1}) ", $session.name, $session.result)) -ForegroundColor Red
+    Write-Host ""
+
+    Write-Host $([string]::Format("Started {0:dd MMM yy HH:mm} ", $session.createdOn)) -ForegroundColor DarkGreen
+    Write-Host $([string]::Format("Ended {0:dd MMM yy HH:mm} ", $session.endedOn)) -ForegroundColor DarkGreen
+
+    $duration = $session.endedOn - $session.createdOn
+    Write-Host $([string]::Format("Backup job took {0} minutes to complete", $duration.Minutes)) -ForegroundColor DarkGreen
     
-    Write-Host "Total cost if terminated now:" -ForegroundColor DarkGreen
-    Write-Host $([string]::Format("{0:c}",$co.totalIfTerminatedNow)) -ForegroundColor White
     Write-Host ""
 
-    Write-Host "Hours in current month:" -ForegroundColor DarkGreen
-    Write-Host $([string]::Format("{0}",$co.hoursInMonth)) -ForegroundColor White
-    Write-Host ""
-
-    Write-Host "Hourly burn at current spec:" -ForegroundColor DarkGreen
-    Write-Host $([string]::Format("{0:c}",$co.burnRateHourly)) -ForegroundColor White
-    Write-Host ""
-
-    Write-Host "Item Breakdown" -ForegroundColor DarkGreen
-    Write-Host ""
-
-    foreach ($bi in $co.billingLineItems)
+    if ($session.includes.Length -gt 0)
     {
-
-        Write-Host $bi.description -ForegroundColor Yellow
-        if ($bi.endedOn)
-        {
-            Write-Host "Terminated on $($bi.endedOn)" -ForegroundColor Red
-            Write-Host $([string]::Format("{0:c} total cost, ran for {2} hours", $bi.total, $bi.currentSpecMonthlyCost, $bi.unitsConsumed)) -ForegroundColor White
-        }
-        else
-        {
-            Write-Host "Active" -ForegroundColor DarkGreen
-            Write-Host $([string]::Format("{0:c} so far ({2} hours), {1:c} if run to month end", $bi.total, $bi.currentSpecMonthlyCost, $bi.unitsConsumed)) -ForegroundColor White
-        }
-    
- 
-        
+        Write-Host "Protected virtual machine summary" -ForegroundColor White
         Write-Host ""
 
+        foreach ($include in $session.includes)
+        {
+            Write-Host $([string]::Format("{0} ({1}) ", $include.name, $include.result)) -ForegroundColor Cyan
+            $vmduration = $include.endedOn - $include.createdOn
+            Write-Host $([string]::Format("VM took {0} minutes to backup", $vmduration.Minutes)) -ForegroundColor Yellow
+            Write-Host ""
+
+        }
     }
+    else
+    {
+            Write-Host "No virtual machines in this job" -ForegroundColor Yellow
+    }
+    Write-Host ""
+    
+
+    Write-Host ""
 
 
-
-}
-else 
-{
-    Write-Log -Message "Could not find $($vmName) on the platform" -Level Error
 }
 
 

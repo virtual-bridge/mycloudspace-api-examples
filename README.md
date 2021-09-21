@@ -15,6 +15,10 @@ Finds a single VM by Hostname (guest hostname) and if found, takes a snapshot wi
 #### VMCost.ps1
 Finds a single VM by the name specified in MyCloudSpace and if found, pulls out billing data for the current period including an hourly burn rate. The payload also includes some virtual machine details such as health, last backup and guest information.
 
+
+#### BackupReport.ps1
+Loops through your recent IaaS backup jobs and show you the start/stop and duration. Then loops through each of the virtual machines protected in that backup job also with duration statistics. 
+
 ## Disclaimer
 
 THE INFORMATION CONTAINED IN THE VIRTUAL BRIDGE DEVELOPER DOCUMENTATION AND EXAMPLES IS INTENDED FOR SOFTWARE DEVELOPERS INTERESTED IN DEVELOPING SERVICE MANAGEMENT APPLICATIONS USING THE MYCLOUDSPACE APPLICATION PROGRAMMING INTERFACE (API). THE DOCUMENT IS FOR INFORMATIONAL PURPOSES ONLY AND IS PROVIDED “AS IS.”
