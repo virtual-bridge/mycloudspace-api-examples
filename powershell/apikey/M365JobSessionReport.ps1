@@ -36,7 +36,7 @@ $username  = ""
 #[CLIENT ID (Optional)] ---------------------#
 #override this to desired clientid if you are a reseller user
 #if you are a client user then this will auotmatically fetched
-$clientId = 10943;
+$clientId = 0;
 
 #------------------- END SETUP ---------------------#
 
