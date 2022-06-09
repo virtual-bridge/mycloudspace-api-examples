@@ -1,24 +1,22 @@
 using namespace System
 
-#Take a snapshot 
+#M365 Backup Report
 
-#.\TakeSnapshotOfVirtualMachine.ps1 -vmName "WIN-2A4JPC0ITEJ" -snapshotName "This is from the API"
+#.\M365TrackUsage.ps1 -vboId 12345
 
 #NOTE: that you need to set your logpath, credentials in the sections below
 
 Param
 (
-	[Parameter(Mandatory=$true)][String] 
-    $vmName,
-    [Parameter(Mandatory=$true)][String] 
-	$snapshotName
+	[Parameter(Mandatory=$true)][int] 
+    $vboId
 )
 
 #------------------- SETUP ---------------------#
 
 #[LOG FILE] ---------------------#
 #log file path you want to output the script log too
-$Script:LogPath = 'C:\Temp\Snapshot.log'
+$Script:LogPath =  'C:\Temp\M365Usage.log'
 
 
 #[LOGIN/CREDENTIALS] -----------------------#
@@ -38,7 +36,7 @@ $username  = ""
 #[CLIENT ID (Optional)] ---------------------#
 #override this to desired clientid if you are a reseller user
 #if you are a client user then this will auotmatically fetched
-$clientId = 0;
+$clientId = 10943;
 
 #------------------- END SETUP ---------------------#
 
@@ -117,14 +115,6 @@ function Write-Log
     } 
 }
 
-$asciiUri = "https://artii.herokuapp.com/make";
-$print = irm "$($asciiUri)?font=big&text=MyCloudSpace API "	
-Write-Host $print -ForegroundColor White
-Write-Host ""
-
-$print = irm "$($asciiUri)?font=ogre&text=Take snapshot"	
-Write-Host $print -ForegroundColor DarkGreen
-Write-Host ""
 
 #base url for the api
 $baseApi = "https://api.mycloudspace.co.nz/";
@@ -152,66 +142,31 @@ if ($clientId -eq 0)
 
 
 
-#get list of virtual machines from the platform
-$clientVms = Invoke-RestMethod -Uri ($baseApi + 'api/client/virtualresources/' + $clientId) -ContentType 'application/json' -Method Get -Headers $headers;
+#get the tenancy
+$vboTenancy = Invoke-RestMethod -Uri ($baseApi + '/api/o365/detailed/' + $vboId) -ContentType 'application/json' -Method Get -Headers $headers;
 
-#find the VM by name
-$vmObj = $clientVms | where {$_.name -eq $vmName}
-if ($vmObj.id)
+Write-Host ""
+Write-Host "@@@@@@@@@@@@@@"
+Write-Host $([string]::Format("{0}", $vboTenancy.provisionedObject.systemReference)) -ForegroundColor Green
+Write-Host "@@@@@@@@@@@@@@"
+Write-Host ""
+
+$storageUsage = $vboTenancy.provisionedObject.objectItems | where {($_.itemCost.item.id -eq "vBOStorage" )}
+$licenseCount = $vboTenancy.provisionedObject.objectItems | where {($_.itemCost.item.id -eq "vBOLicenseUser" )}
+
+
+if ($licenseCount.Length -gt 0)
 {
-    Write-Log -Message "Found $($vmObj.name)"
-
-    #snapshot payload
-    $createSnapshotBody = [pscustomobject]@{
-        VirtualResourceId=$vmObj.id;
-        Name=$snapshotName;
-    }
-
-    Write-Log "Creating snapshot on $($vmObj.name)"
-
-    $snapshotOperation = Invoke-RestMethod -Uri ($baseApi + 'api/virtualresource/snapshotcreate') -Body ($createSnapshotBody | ConvertTo-Json) -ContentType 'application/json' -Method Post -Headers $headers;
-    
-    #sleep before checking snapshot exsits, wait for platform to apply snap
-    Write-Log "Sleeping for 5 seconds"	
-    Start-Sleep 5
-
-    $snapshotLoopCount = 0;
-	$snapshotFound = $false;				
-    Do {
-
-        $snapshotLoopCount++
-
-        if($snapshotLoopCount -gt 6) {
-            Write-Log "We have reached a maximum loop count, something must be wrong, not trying again." -Level Error
-            break
-        }
-
-        Write-Log "Fetching $($vmObj.name) snapshots from platform"
-        
-        $vmSnapshots = Invoke-RestMethod -Uri ($baseApi + 'api/virtualresource/snapshots/' + $vmObj.id) -ContentType 'application/json' -Method Get -Headers $headers;
-
-        foreach ($snap in $vmSnapshots)
-        {
-            #does a snapshot match what we created?
-            if ($snap.name.StartsWith($snapshotName))
-            {
-                Write-Log "Found snapshot called $($snap.name) that matches, good to go."
-                $snapshotFound = $true;
-            }
-        }
-
-        Write-Log "Sleeping for 5 seconds" 
-        Start-Sleep 5
-    } 
-    While ($snapshotFound -ne $true)
-
-
-}
-else 
-{
-    Write-Log -Message "Could not find $($vmName) on the platform" -Level Error
+    Write-Host $([string]::Format("Users (licensed): {0}", $licenseCount[0].quantity)) -ForegroundColor Yellow
 }
 
+
+if ($storageUsage.Length -gt 0)
+{
+    Write-Host $([string]::Format("Data usage: {0:n0} gb", $storageUsage[0].quantity)) -ForegroundColor Yellow
+}
+
+Write-Host ""
 
 
 

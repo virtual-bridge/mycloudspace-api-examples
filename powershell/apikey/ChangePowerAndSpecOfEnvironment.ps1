@@ -26,7 +26,7 @@ Param
 
 #[LOG FILE] ---------------------#
 #log file path you want to output the script log too
-$Script:LogPath = 'C:\Temp\AutoPowerOnOff.log'
+$Script:LogPath = 'C:\Temp\PowerSpec.log'
 
 #[SERVER LIST] ------------------#
 #object array needs to contain objects with in the following format/example where the poweredOnXXX is the value you wish to configure
@@ -37,10 +37,7 @@ $Script:LogPath = 'C:\Temp\AutoPowerOnOff.log'
 # 	[pscustomobject]@{name="NIC_Test2";poweredOnCores=2;poweredOnSockets=2;poweredOnMemory=4},
 # 	[pscustomobject]@{name="NIC_Test3";poweredOnCores=4;poweredOnSockets=1;poweredOnMemory=2}
 # )
-$vmList =
-@(
 
-)
 
 #[LOGIN/CREDENTIALS] -----------------------#
 #it is *not recommended* to store these values as plain text - you should secure them out.
@@ -143,6 +140,16 @@ function Write-Log
 }
 
 
+$asciiUri = "https://artii.herokuapp.com/make";
+$print = irm "$($asciiUri)?font=big&text=MyCloudSpace API "	
+Write-Host $print -ForegroundColor White
+Write-Host ""
+
+$print = irm "$($asciiUri)?font=ogre&text=Power and Spec"	
+Write-Host $print -ForegroundColor DarkGreen
+Write-Host ""
+
+
 Write-Host $mode
 if (!$mode) {
     Write-Log -Message "Please set the mode of the script (param name mode, values on or off)" -Level Error
@@ -180,7 +187,12 @@ $clientVms = Invoke-RestMethod -Uri ($baseApi + 'api/client/virtualresources/' +
 
 foreach ($vm in $vmList)
 {
-	$($vm.name)
+	# $($vm.name)
+
+	$asciiUri = "https://artii.herokuapp.com/make";
+	$print = irm "$($asciiUri)?font=big&text=$($vm.name)"	
+	Write-Host $print -ForegroundColor Cyan
+	Write-Host ""
 	#find the VM in the VM list returned from the clients so we can get the id etc
 	$vmObj = $clientVms | where {$_.name -eq $vm.name}
 	
