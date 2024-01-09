@@ -117,15 +117,6 @@ function Write-Log
     } 
 }
 
-$asciiUri = "https://artii.herokuapp.com/make";
-$print = irm "$($asciiUri)?font=big&text=MyCloudSpace API "	
-Write-Host $print -ForegroundColor White
-Write-Host ""
-
-$print = irm "$($asciiUri)?font=ogre&text=Take snapshot"	
-Write-Host $print -ForegroundColor DarkGreen
-Write-Host ""
-
 #base url for the api
 $baseApi = "https://api.mycloudspace.co.nz/";
 

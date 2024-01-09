@@ -140,15 +140,6 @@ function Write-Log
 }
 
 
-$asciiUri = "https://artii.herokuapp.com/make";
-$print = irm "$($asciiUri)?font=big&text=MyCloudSpace API "	
-Write-Host $print -ForegroundColor White
-Write-Host ""
-
-$print = irm "$($asciiUri)?font=ogre&text=Power and Spec"	
-Write-Host $print -ForegroundColor DarkGreen
-Write-Host ""
-
 
 Write-Host $mode
 if (!$mode) {
@@ -189,10 +180,6 @@ foreach ($vm in $vmList)
 {
 	# $($vm.name)
 
-	$asciiUri = "https://artii.herokuapp.com/make";
-	$print = irm "$($asciiUri)?font=big&text=$($vm.name)"	
-	Write-Host $print -ForegroundColor Cyan
-	Write-Host ""
 	#find the VM in the VM list returned from the clients so we can get the id etc
 	$vmObj = $clientVms | where {$_.name -eq $vm.name}
 	
